@@ -1,0 +1,52 @@
+{
+    "Actions": [
+        {
+            "Icon": "icons/pluginIcon",
+            "Name": "ON/OFF Switch",
+            "States": [
+                {
+                    "Name": "Turn On",
+                    "Image": "icons/pluginIcon",
+                    "Title": "Turn On",
+                    "TitleAlignment": "bottom",
+                    "FontSize": "10"
+                },
+                {
+                    "Name": "Turn Off",
+                    "Image": "icons/pluginIcon",
+                    "Title": "Turn Off",
+                    "TitleAlignment": "bottom",
+                    "FontSize": "10"
+                }
+            ],
+            "SupportedInMultiActions": true,
+            "PropertyInspectorPath": "pi/switch.html",
+            "Tooltip": "Send an ON/OFF MQTT message to your MQTT server",
+            "UUID": "com.bretterer.mqtt.switch"
+        }
+    ],
+    "SDKVersion": 2,
+    "Author": "Brian Retterer",
+    "CodePath": "index.html",
+    "Description": "This plugin will send a message to your MQTT server with a custom payload",
+    "Category": "MQTT",
+    "CategoryIcon": "icons/pluginIcon",
+    "Name": "MQTT",
+    "Icon": "icons/pluginIcon",
+    "URL": "https://bretterer.com/streamDeck-MQTT",
+    "Version": "0.0.1",
+    "OS": [
+        {
+            "Platform": "mac",
+            "MinimumVersion": "10.11"
+        },
+        {
+            "Platform": "windows",
+            "MinimumVersion": "10"
+        }
+    ],
+    "Software":
+        {
+            "MinimumVersion": "4.1"
+        }
+}
