@@ -66,7 +66,7 @@ function settingsReceived(settings) {
 }
 
 function registerChangeDetection() {
-    getInputs().forEach(element => element.addEventListener("input", () => saveSettings()));
+    getInputs().forEach(element => element.addEventListener("change", () => saveSettings()));
 }
 
 function getInputs() {
@@ -95,31 +95,3 @@ function saveSettings() {
         );
     }
 }
-
-function sendValueToPlugin(val, param) {
-    if (isConnectedToPropertyInspector()) {
-        // let payload = {};
-
-        // getInputs().forEach(element => {
-        //     payload[element.id] = element.value;
-        // });
-
-        // socket.send(
-        //     JSON.stringify({
-        //         action: inspector.inActionInfo["action"],
-        //         event: "sendToPlugin",
-        //         context: inspector.uuid,
-        //         payload
-        //     })
-        // );
-
-        const json = {
-            action: inspector.inActionInfo["action"],
-            event: "sendToPlugin",
-            context: inspector.uuid,
-            payload: { [param]: value },
-          };
-
-        websocket.send(JSON.stringify(json));
-    }
-  }

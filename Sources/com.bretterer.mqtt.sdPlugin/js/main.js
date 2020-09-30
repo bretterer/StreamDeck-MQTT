@@ -28,22 +28,8 @@ function connectElgatoStreamDeckSocket(inPort, inPluginUUID, inRegisterEvent, in
             setUpMqttClient(jsonObj);
         }
 
-        if (jsonObj['event'] == "propertyInspectorDidDisappear") {
-            var json = {
-                "event": "getSettings",
-                "context": jsonObj['context']
-            };
-
-            websocket.send(JSON.stringify(json));
-
-            pluginGotSettings = true;
-        }
-
         if (jsonObj['event'] == "didReceiveSettings") {
-            if(pluginGotSettings) {
-                setUpMqttClient(jsonObj);
-                pluginGotSettings = false;
-            }
+            setUpMqttClient(jsonObj);
         }
 
         if (jsonObj['event'] == "keyDown") {
