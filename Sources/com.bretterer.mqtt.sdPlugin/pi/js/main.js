@@ -2,16 +2,15 @@ let socket = null;
 let inspector = {};
 
 function connectElgatoStreamDeckSocket(inPort, inUUID, inRegisterEvent, inInfo, inActionInfo) {
-    debugger;
     inspector.registerEvent = inRegisterEvent;
     inspector.port = inPort;
     inspector.uuid = inUUID;
+    inspector.inActionInfo = inActionInfo;
 
     connectToWebSocket();
 }
 
 function connectToWebSocket() {
-    debugger;
     socket = new WebSocket("ws://127.0.0.1:" + inspector.port);
     socket.onopen = _ => connectedToPropertyInspector();
     socket.onmessage = message => messageReceived(message);
@@ -19,7 +18,6 @@ function connectToWebSocket() {
 }
 
 function connectedToPropertyInspector() {
-    debugger;
     registerPropertyInspector();
 
     requestSettings();
@@ -28,7 +26,6 @@ function connectedToPropertyInspector() {
 }
 
 function messageReceived(message) {
-    debugger;
     const json = JSON.parse(message.data);
 
     if (json.event === "didReceiveSettings") {
@@ -37,7 +34,6 @@ function messageReceived(message) {
 }
 
 function registerPropertyInspector() {
-    debugger;
     socket.send(
         JSON.stringify({
             event: inspector.registerEvent,
@@ -47,7 +43,6 @@ function registerPropertyInspector() {
 }
 
 function requestSettings() {
-    debugger;
     if (isConnectedToPropertyInspector()) {
         socket.send(
             JSON.stringify({
@@ -59,12 +54,10 @@ function requestSettings() {
 }
 
 function isConnectedToPropertyInspector() {
-    debugger;
     return socket && socket.readyState === 1;
 }
 
 function settingsReceived(settings) {
-    debugger;
     Object.entries(settings).forEach(([key, value]) => {
         const element = document.getElementById(key);
 
@@ -73,12 +66,10 @@ function settingsReceived(settings) {
 }
 
 function registerChangeDetection() {
-    debugger;
     getInputs().forEach(element => element.addEventListener("input", () => saveSettings()));
 }
 
 function getInputs() {
-    debugger;
     return Array.from(document.querySelectorAll(".sdpi-item-value")).map(element => {
         if (element.tagName !== "INPUT" && element.tagName !== "TEXTAREA") {
             return element.querySelector("input");
@@ -88,7 +79,6 @@ function getInputs() {
 }
 
 function saveSettings() {
-    debugger;
     if (isConnectedToPropertyInspector()) {
         let payload = {};
 
@@ -105,3 +95,31 @@ function saveSettings() {
         );
     }
 }
+
+function sendValueToPlugin(val, param) {
+    if (isConnectedToPropertyInspector()) {
+        // let payload = {};
+
+        // getInputs().forEach(element => {
+        //     payload[element.id] = element.value;
+        // });
+
+        // socket.send(
+        //     JSON.stringify({
+        //         action: inspector.inActionInfo["action"],
+        //         event: "sendToPlugin",
+        //         context: inspector.uuid,
+        //         payload
+        //     })
+        // );
+
+        const json = {
+            action: inspector.inActionInfo["action"],
+            event: "sendToPlugin",
+            context: inspector.uuid,
+            payload: { [param]: value },
+          };
+
+        websocket.send(JSON.stringify(json));
+    }
+  }

@@ -15,42 +15,42 @@
 
                 <div class="sdpi-item">
                     <div class="sdpi-item-label">MQTT Server</div>
-                    <input class="sdpi-item-value" id="mqttServer" value="" placeholder="192.168.1.100">
+                    <input class="sdpi-item-value" id="mqttServer" value="" onchange="sendValueToPlugin()" placeholder="192.168.1.100">
                 </div>
 
                 <div class="sdpi-item">
                     <div class="sdpi-item-label">MQTT Port</div>
-                    <input class="sdpi-item-value" id="mqttPort" value="" placeholder="1883">
+                    <input class="sdpi-item-value" id="mqttPort" value="" onchange="sendValueToPlugin(event.target.value, 'mqttPort')" placeholder="1883">
                 </div>
 
                 <div class="sdpi-item">
                     <div class="sdpi-item-label">MQTT Username</div>
-                    <input class="sdpi-item-value" id="mqttUser" value="" placeholder="">
+                    <input class="sdpi-item-value" id="mqttUser" value="" onchange="sendValueToPlugin(event.target.value, 'mqttUser')" placeholder="">
                 </div>
 
                 <div class="sdpi-item">
                     <div class="sdpi-item-label">MQTT Password</div>
-                    <input class="sdpi-item-value" id="mqttPass" value="" type="password" placeholder="">
+                    <input class="sdpi-item-value" id="mqttPass" value="" onchange="sendValueToPlugin(event.target.value, 'mqttPass')" type="password" placeholder="">
                 </div>
 
                 <div class="sdpi-item">
                     <div class="sdpi-item-label">Command Topic</div>
-                    <input class="sdpi-item-value" id="commandTopic" value="" placeholder="">
+                    <input class="sdpi-item-value" id="commandTopic" value="" onchange="sendValueToPlugin()" placeholder="">
                 </div>
 
                 <div class="sdpi-item">
                     <div class="sdpi-item-label">State Topic</div>
-                    <input class="sdpi-item-value" id="stateTopic" value="" placeholder="">
+                    <input class="sdpi-item-value" id="stateTopic" value="" onchange="sendValueToPlugin()" placeholder="">
                 </div>
 
                 <div class="sdpi-item">
                     <div class="sdpi-item-label">Payload On</div>
-                    <input class="sdpi-item-value" id="payloadOn" value="" placeholder="">
+                    <input class="sdpi-item-value" id="payloadOn" value="" onchange="sendValueToPlugin()" placeholder="">
                 </div>
 
                 <div class="sdpi-item">
                     <div class="sdpi-item-label">Payload Off</div>
-                    <input class="sdpi-item-value" id="payloadOff" value="" placeholder="">
+                    <input class="sdpi-item-value" id="payloadOff" value="" onchange="sendValueToPlugin()" placeholder="">
                 </div>
 
 
