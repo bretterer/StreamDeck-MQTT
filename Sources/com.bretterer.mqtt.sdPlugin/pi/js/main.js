@@ -31,6 +31,7 @@ function messageReceived(message) {
     if (json.event === "didReceiveSettings") {
         settingsReceived(json.payload.settings);
     }
+
 }
 
 function registerPropertyInspector() {

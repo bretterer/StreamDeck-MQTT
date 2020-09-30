@@ -4,25 +4,23 @@ let mqttServer = null;
 let mqttPort = null;
 let mqttUser = null;
 let mqttPass = null;
-let client = null;
-let pluginGotSettings = false;
+let mqttClients = {};
 
 function connectElgatoStreamDeckSocket(inPort, inPluginUUID, inRegisterEvent, inInfo) {
     pluginUUID = inPluginUUID;
     websocket = new WebSocket("ws://127.0.0.1:" + inPort);
 
     websocket.onopen = function () {
-        const json = {
+        websocket.send(
+            JSON.stringify({
             "event": inRegisterEvent,
             "uuid": inPluginUUID
-        };
-
-        websocket.send(JSON.stringify(json));
+            })
+        );
     };
 
     websocket.onmessage = function (evt) {
         const jsonObj = JSON.parse(evt.data);
-        // console.log(jsonObj['event']);
 
         if (jsonObj['event'] == "willAppear") {
             setUpMqttClient(jsonObj);
@@ -32,24 +30,20 @@ function connectElgatoStreamDeckSocket(inPort, inPluginUUID, inRegisterEvent, in
             setUpMqttClient(jsonObj);
         }
 
-        if (jsonObj['event'] == "keyDown") {
-
+        if (jsonObj['event'] == "keyUp") {
             if(jsonObj['action'] == "com.bretterer.mqtt.switch") {
                 commandTopic = getProperty(jsonObj.payload, "commandTopic", null);
                 payloadOn = getProperty(jsonObj.payload, "payloadOn", "ON");
                 payloadOff = getProperty(jsonObj.payload, "payloadOff", "OFF");
 
-                if(jsonObj.payload.state == 0) {
-                    payload = payloadOn
-                } else {
+                if(jsonObj.payload.state == 1) {
                     payload = payloadOff
+                } else {
+                    payload = payloadOn
                 }
             }
 
-            client.publish(commandTopic, payload, function(err) {
-
-                console.log(err);
-            });
+            mqttClients[jsonObj.context].publish(commandTopic, payload);
 
         }
     };
@@ -72,39 +66,68 @@ function setUpMqttClient(jsonObj) {
     mqttPort = getProperty(jsonObj.payload, "mqttPort", null);
     mqttUser = getProperty(jsonObj.payload, "mqttUser", null);
     mqttPass = getProperty(jsonObj.payload, "mqttPass", null);
-    console.log(mqttServer, mqttPort, mqttUser, mqttPass);
 
     if(mqttServer == null || mqttPort == null) {
         return;
     }
 
-    stateTopic = getProperty(jsonObj.payload, "stateTopic", null);
+    clientOptions = {};
 
-    client  = mqtt.connect("ws://" + mqttServer + ":" + mqttPort, {"username": mqttUser, "password": mqttPass})
+    if(mqttUser && mqttPass) {
+        clientOptions.username = mqttUser;
+        clientOptions.password = mqttPass;
+    }
 
-    client.on('connect', function () {
-        client.subscribe(stateTopic, {'qos': 1}, function(err) {
+    try {
+        client  = mqtt.connect("ws://" + mqttServer + ":" + mqttPort, clientOptions);
+        let stateTopic = getProperty(jsonObj.payload, "stateTopic", null);
 
-        })
-    })
-
-    client.on('message', function (topic, message) {
-        // message is Buffer
-        state = message.toString();
-        let json = {
-            "event": "setState",
-            "context": jsonObj.context,
-            "payload": {
-                "state": 0
+        client.on('connect', function () {
+            if(stateTopic) {
+                client.subscribe(stateTopic, {"qos": 1}, (err) => {
+                    if(err) {
+                        console.log(err)
+                    }
+                });
             }
-        };
+        });
 
-        if(state == "ON") {
-            json.payload.state = 1
-        } else {
-            json.payload.state = 0
-        }
+        client.on('message', function (topic, message) {
+            // message is Buffer
+            payloadOn = getProperty(jsonObj.payload, "payloadOn", "ON");
+            payloadOff = getProperty(jsonObj.payload, "payloadOff", "OFF");
+            state = message.toString();
+            console.log(topic, state);
+            let json = {
+                "event": "setState",
+                "context": jsonObj.context,
+                "payload": {
+                    "state": 0
+                }
+            };
 
-        websocket.send(JSON.stringify(json));
-    })
+            if(state == payloadOn) {
+                json.payload.state = 1
+            } else if (state == payloadOff) {
+                json.payload.state = 0
+            }
+
+            websocket.send(JSON.stringify(json));
+
+        });
+
+        mqttClients[jsonObj.context] = client;
+
+    } catch (err) {
+        client.end();
+        websocket.send(
+            JSON.stringify({
+            "event": "showAlert",
+            "context": jsonObj.context,
+            })
+        );
+
+    }
+
+
 }
